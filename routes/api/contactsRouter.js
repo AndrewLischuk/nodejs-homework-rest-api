@@ -5,7 +5,9 @@ const {
   getContactById,
   addContact,
   removeContact,
+  updateContact,
 } = require("../../models/contacts");
+const schema = require("../../validation/validation");
 
 const router = express.Router();
 
@@ -25,8 +27,12 @@ router
   })
 
   .post("/", async (req, res, next) => {
-    const newContact = await addContact(req.body);
-    res.status(201).json(newContact);
+    const { error, value } = schema.validate(req.body);
+    if (!error) {
+      const newContact = await addContact(value);
+      return res.status(201).json(newContact);
+    }
+    return res.status(400).json({ message: `${error}` });
   })
 
   .delete("/:contactId", async (req, res, next) => {
@@ -40,7 +46,16 @@ router
   })
 
   .put("/:contactId", async (req, res, next) => {
-    res.json({ message: "put req" });
+    const { contactId } = req.params;
+
+    const { error, value } = schema.validate(req.body);
+    if (!error) {
+      const updatedContact = await updateContact(contactId, value);
+      return updatedContact
+        ? res.status(200).json(updatedContact)
+        : res.status(404).json({ message: "not found" });
+    }
+    return res.status(400).json({ message: `${error}` });
   });
 
 module.exports = router;

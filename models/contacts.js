@@ -38,14 +38,22 @@ const addContact = async ({ name, email, phone }) => {
   return newContact;
 };
 
-// const updateContact = async (contactId, body) => {
-//   await fs.writeFile(contactsPath, JSON.stringify(data, null, 2), "utf8");
-// };
+const updateContact = async (contactId, { name, email, phone }) => {
+  const contacts = await removeContact(contactId);
+
+  if (contacts) {
+    const newContact = { id: contactId, name, email, phone };
+    contacts.push(newContact);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2), "utf8");
+    return newContact;
+  }
+  return null;
+};
 
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
-  // updateContact,
+  updateContact,
 };
