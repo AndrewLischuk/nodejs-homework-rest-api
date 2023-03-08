@@ -6,10 +6,13 @@ const {
   addContact,
   removeContact,
   updateContact,
-} = require("../../models/contacts");
-const { postReq, putReq } = require("../../validation/validation");
+} = require("../../controllers/contacts");
+const { postReq, putReq } = require("../../middlewares/validation");
+const modelsMiddleware = require("../../middlewares/models");
 
 const router = express.Router();
+
+router.use(modelsMiddleware);
 
 router
   .get("/", async (req, res, next) => {
