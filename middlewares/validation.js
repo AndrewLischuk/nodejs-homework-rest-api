@@ -1,39 +1,61 @@
 const Joi = require("joi");
 
-const postReq = Joi.object({
-  name: Joi.string()
-    .pattern(/^[a-zA-Z][a-zA-Z0-9\s-_\.]{0,30}$/)
-    .required(),
+const postContactValidation = (req, res, next) => {
+  const postReq = Joi.object({
+    name: Joi.string()
+      .pattern(/^[a-zA-Z][a-zA-Z0-9\s-_\.]{0,30}$/)
+      .required(),
 
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    })
-    .required(),
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      })
+      .required(),
 
-  phone: Joi.string()
-    .length(14)
-    .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
-    .required(),
-});
+    phone: Joi.string()
+      .length(14)
+      .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
+      .required(),
+  });
 
-const putReq = Joi.object({
-  name: Joi.string()
-    .allow("")
-    .pattern(/^[a-zA-Z][a-zA-Z0-9\s-_\.]{0,30}$/),
+  const validationResult = postReq.validate(req.body);
+  if (validationResult.error) {
+    return res.status(400).json({ message: `${validationResult.error}` });
+  }
+  next();
+};
 
-  email: Joi.string()
-    .allow("")
-    .email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    }),
+const putContactValidation = (req, res, next) => {
+  const putReq = Joi.object({
+    name: Joi.string()
+      .allow("")
+      .pattern(/^[a-zA-Z][a-zA-Z0-9\s-_\.]{0,30}$/)
+      .optional(),
 
-  phone: Joi.string()
-    .allow("")
-    .length(14)
-    .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/),
-});
+    email: Joi.string()
+      .allow("")
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+      })
+      .optional(),
 
-module.exports = { postReq, putReq };
+    phone: Joi.string()
+      .allow("")
+      .length(14)
+      .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
+      .optional(),
+  });
+
+  const validationResult = putReq.validate(req.body);
+  if (validationResult.error) {
+    return res.status(400).json({ message: `${validationResult.error}` });
+  }
+  next();
+};
+
+module.exports = {
+  postContactValidation,
+  putContactValidation,
+};

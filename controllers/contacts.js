@@ -1,46 +1,31 @@
-const fs = require("fs").promises;
-const path = require("path");
-const { v4 } = require("uuid");
-const { connectMongo } = require("../db/connection");
-
-// const contactsPath = path.resolve("./models/contacts.json");
+const { Contact } = require("../db/contactModel");
 
 const listContacts = async (req, res) => {
-  console.log(req.db);
-  // const data = await req.db.Contacts.find({}).toArray();
-  // return data;
+  const contactsList = await Contact.find({});
+  res.json(contactsList);
 };
 
-const getContactById = async (contactId) => {
-  // const contactList = await listContacts();
-  // const contact = contactList.find((contact) => contact.id === contactId);
-  // return contact || null;
+const getContactById = async (req, res) => {
+  const { contactId } = req.params;
+  const contact = await Contact.findById(contactId);
+  contact ? res.json(contact) : res.status(404).json({ message: "not found" });
 };
 
-const removeContact = async (contactId) => {
-  // const contactList = await listContacts();
-  // const contact = contactList.find((contact) => contact.id === contactId);
-  // if (contact) {
-  //   const contacts = contactList.filter((item) => item.id !== contactId);
-  //   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2), "utf8");
-  //   return contacts;
-  // }
-  // return null;
+const addContact = async (req, res) => {
+  const { name, email, phone } = req.body;
+
+  const contact = new Contact({ name, email, phone });
+  await contact.save();
+  return res.status(201).json(contact);
 };
 
-const addContact = async ({ name, email, phone }) => {
-  // const contactList = await listContacts();
-  // const newContact = { id: v4(), name, email, phone };
-  // contactList.push(newContact);
-  // await fs.writeFile(
-  //   contactsPath,
-  //   JSON.stringify(contactList, null, 2),
-  //   "utf8"
-  // );
-  // return newContact;
+const removeContact = async (req, res) => {
+  const { contactId } = req.params;
+  await Contact.findByIdAndRemove(contactId);
+  res.status(200).json({ message: "contact deleted" });
 };
 
-const updateContact = async (contactId, { name, email, phone }) => {
+const updateContact = async (req, res) => {
   // const contactList = await listContacts();
   // const idx = contactList.findIndex(
   //   (contact) => contact.id === String(contactId)
@@ -63,6 +48,28 @@ const updateContact = async (contactId, { name, email, phone }) => {
   //   "utf8"
   // );
   // return contactList[idx];
+  //   !!!
+  const { contactId } = req.params;
+  const { name, email, phone } = req.body;
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, {
+    $set: { name, email, phone },
+  });
+  // !!!
+  // if (!req.body.name && !req.body.email && !req.body.phone) {
+  //   return res.status(400).json({ message: "missing fields" });
+  // }
+  // const { error, value } = putReq.validate(req.body);
+  // if (error) {
+  //   return res.status(400).json({ message: `${error}` });
+  // }
+  // !!!
+  // const updatedContact = await req.db.Contacts.findOne({
+  //   _id: new ObjectId(contactId),
+  // });
+  // // const updatedContact = await updateContact(contactId, value);
+  // return updatedContact ?
+  res.status(200).json(updatedContact);
+  //   : res.status(404).json({ message: "not found" });
 };
 
 module.exports = {
