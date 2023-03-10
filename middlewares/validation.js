@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { ValidationError } = require("../helpers/errors");
 
 const postContactValidation = (req, res, next) => {
   const postReq = Joi.object({
@@ -21,7 +22,7 @@ const postContactValidation = (req, res, next) => {
 
   const validationResult = postReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
@@ -47,7 +48,7 @@ const putContactValidation = (req, res, next) => {
 
   const validationResult = putReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
@@ -59,7 +60,7 @@ const patchFavValidation = (req, res, next) => {
 
   const validationResult = patchReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
