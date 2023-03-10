@@ -1,4 +1,3 @@
-const { json } = require("body-parser");
 const { Contact } = require("../db/contactModel");
 
 const listContacts = async (req, res) => {

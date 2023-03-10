@@ -29,4 +29,4 @@ router
 
   .patch("/:contactId/favorite", patchFavValidation, updateStatus);
 
-module.exports = router;
+module.exports = { contactsRouter: router };
