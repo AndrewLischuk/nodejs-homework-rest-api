@@ -1,3 +1,4 @@
+const { json } = require("body-parser");
 const { Contact } = require("../db/contactModel");
 
 const listContacts = async (req, res) => {
@@ -12,9 +13,13 @@ const getContactById = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, email, phone, favorite } = req.body;
 
-  const contact = new Contact({ name, email, phone });
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "missing fields" });
+  }
+
+  const contact = new Contact({ name, email, phone, favorite });
   await contact.save();
   return res.status(201).json(contact);
 };
@@ -26,50 +31,34 @@ const removeContact = async (req, res) => {
 };
 
 const updateContact = async (req, res) => {
-  // const contactList = await listContacts();
-  // const idx = contactList.findIndex(
-  //   (contact) => contact.id === String(contactId)
-  // );
-  // if (idx === -1) {
-  //   return null;
-  // }
-  // if (name) {
-  //   contactList[idx].name = name;
-  // }
-  // if (email) {
-  //   contactList[idx].email = email;
-  // }
-  // if (phone) {
-  //   contactList[idx].phone = phone;
-  // }
-  // await fs.writeFile(
-  //   contactsPath,
-  //   JSON.stringify(contactList, null, 2),
-  //   "utf8"
-  // );
-  // return contactList[idx];
-  //   !!!
   const { contactId } = req.params;
   const { name, email, phone } = req.body;
-  const updatedContact = await Contact.findByIdAndUpdate(contactId, {
-    $set: { name, email, phone },
-  });
-  // !!!
-  // if (!req.body.name && !req.body.email && !req.body.phone) {
-  //   return res.status(400).json({ message: "missing fields" });
-  // }
-  // const { error, value } = putReq.validate(req.body);
-  // if (error) {
-  //   return res.status(400).json({ message: `${error}` });
-  // }
-  // !!!
-  // const updatedContact = await req.db.Contacts.findOne({
-  //   _id: new ObjectId(contactId),
-  // });
-  // // const updatedContact = await updateContact(contactId, value);
-  // return updatedContact ?
+
+  const updatedContact = await Contact.findByIdAndUpdate(
+    contactId,
+    {
+      $set: { name, email, phone },
+    },
+    { new: true }
+  );
   res.status(200).json(updatedContact);
-  //   : res.status(404).json({ message: "not found" });
+};
+
+const updateStatus = async (req, res) => {
+  const { contactId } = req.params;
+  const { favorite } = req.body;
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "missing field favorite" });
+  }
+
+  const updatedStatus = await Contact.findByIdAndUpdate(
+    contactId,
+    {
+      $set: { favorite },
+    },
+    { new: true }
+  );
+  res.status(200).json(updatedStatus);
 };
 
 module.exports = {
@@ -78,4 +67,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatus,
 };

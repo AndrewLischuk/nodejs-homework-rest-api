@@ -5,10 +5,12 @@ const {
   addContact,
   removeContact,
   updateContact,
+  updateStatus,
 } = require("../../controllers/contacts");
 const {
   postContactValidation,
   putContactValidation,
+  patchFavValidation,
 } = require("../../middlewares/validation");
 const { asyncWrapper } = require("../../helpers/apiHelpers");
 
@@ -23,6 +25,8 @@ router
 
   .delete("/:contactId", asyncWrapper(removeContact))
 
-  .put("/:contactId", putContactValidation, asyncWrapper(updateContact));
+  .put("/:contactId", putContactValidation, asyncWrapper(updateContact))
+
+  .patch("/:contactId/favorite", patchFavValidation, updateStatus);
 
 module.exports = router;
