@@ -1,13 +1,21 @@
 const { Contact } = require("../db/contactModel");
 const { WrongParametersError } = require("../helpers/errors");
 
-const getListContacts = async () => {
-  const contactsList = await Contact.find({});
+const getListContacts = async (userId, favorite) => {
+  if (favorite) {
+    const favoriteContactsList = await Contact.find({
+      owner: userId,
+      favorite,
+    });
+    return favoriteContactsList;
+  }
+
+  const contactsList = await Contact.find({ owner: userId });
   return contactsList;
 };
 
-const getContactById = async (contactId) => {
-  const contact = await Contact.findById(contactId);
+const getContactById = async (contactId, userId) => {
+  const contact = await Contact.findOne({ _id: contactId, owner: userId });
   if (!contact) {
     throw new WrongParametersError(
       `Failure! Contact with id "${contactId}" not found`
@@ -16,39 +24,66 @@ const getContactById = async (contactId) => {
   return contact;
 };
 
-const addContact = async ({ name, email, phone, favorite }) => {
-  const contact = new Contact({ name, email, phone, favorite });
+const addContact = async ({ name, email, phone, favorite }, userId) => {
+  const contact = new Contact({
+    name,
+    email,
+    phone,
+    favorite,
+    owner: userId,
+  });
   await contact.save();
   return contact;
 };
 
-const removeContact = async (contactId) => {
-  await Contact.findByIdAndRemove(contactId);
+const removeContact = async (contactId, userId) => {
+  const removedContact = await Contact.findOneAndRemove({
+    _id: contactId,
+    owner: userId,
+  });
+  if (!removedContact) {
+    throw new WrongParametersError(
+      `Failure! Contact with id "${contactId}" not found`
+    );
+  }
 };
 
-const updateContact = async (contactId, { name, email, phone, favorite }) => {
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
+const updateContact = async (
+  contactId,
+  { name, email, phone, favorite },
+  userId
+) => {
+  const updatedContact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner: userId },
     {
       $set: { name, email, phone, favorite },
     },
     { new: true }
   );
+  if (!updatedContact) {
+    throw new WrongParametersError(
+      `Failure! Contact with id "${contactId}" not found`
+    );
+  }
   return updatedContact;
 };
 
-const updateStatus = async (contactId, favorite) => {
-  // if (Object.keys(req.body).length === 0) {
-  //   return res.status(400).json({ message: "missing field favorite" });
-  // }
-
-  const updatedStatus = await Contact.findByIdAndUpdate(
-    contactId,
+const updateStatus = async (contactId, favorite, userId) => {
+  const updatedStatus = await Contact.findOneAndUpdate(
+    { _id: contactId, owner: userId },
     {
       $set: { favorite },
     },
     { new: true }
   );
+  console.log(updatedStatus);
+
+  if (!updatedStatus) {
+    throw new WrongParametersError(
+      `Failure! Contact with id "${contactId}" not found`
+    );
+  }
+
   return updatedStatus;
 };
 

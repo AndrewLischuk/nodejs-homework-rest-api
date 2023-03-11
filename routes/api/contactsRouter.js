@@ -13,8 +13,11 @@ const {
   patchFavValidation,
 } = require("../../middlewares/validation");
 const { asyncWrapper } = require("../../helpers/apiHelpers");
+const { authMiddleware } = require("../../middlewares/authMiddleware");
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 router
   .get("/", asyncWrapper(getListContactsController))
@@ -31,6 +34,10 @@ router
     asyncWrapper(updateContactController)
   )
 
-  .patch("/:contactId/favorite", patchFavValidation, updateStatusController);
+  .patch(
+    "/:contactId/favorite",
+    patchFavValidation,
+    asyncWrapper(updateStatusController)
+  );
 
 module.exports = { contactsRouter: router };

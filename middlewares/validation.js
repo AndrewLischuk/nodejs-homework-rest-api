@@ -65,8 +65,21 @@ const patchFavValidation = (req, res, next) => {
   next();
 };
 
+const patchSubscrValidation = (req, res, next) => {
+  const patchReq = Joi.object({
+    subscription: Joi.string().optional().valid("starter", "pro", "business"),
+  });
+
+  const validationResult = patchReq.validate(req.query);
+  if (validationResult.error) {
+    next(new ValidationError(validationResult.error));
+  }
+  next();
+};
+
 module.exports = {
   postContactValidation,
   putContactValidation,
   patchFavValidation,
+  patchSubscrValidation,
 };

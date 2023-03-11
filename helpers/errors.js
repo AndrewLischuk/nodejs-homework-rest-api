@@ -1,18 +1,42 @@
-class ValidationError extends Error {
+class CustomProjectError extends Error {
   constructor(message) {
     super(message);
     this.status = 400;
   }
 }
 
-class WrongParametersError extends Error {
+class ValidationError extends CustomProjectError {
   constructor(message) {
     super(message);
     this.status = 400;
+  }
+}
+
+class WrongParametersError extends CustomProjectError {
+  constructor(message) {
+    super(message);
+    this.status = 400;
+  }
+}
+
+class NotAuthorizedError extends CustomProjectError {
+  constructor(message) {
+    super(message);
+    this.status = 401;
+  }
+}
+
+class ConflictError extends CustomProjectError {
+  constructor(message) {
+    super(message);
+    this.status = 409;
   }
 }
 
 module.exports = {
+  CustomProjectError,
   ValidationError,
   WrongParametersError,
+  NotAuthorizedError,
+  ConflictError,
 };
