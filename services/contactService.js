@@ -1,16 +1,8 @@
 const { Contact } = require("../db/contactModel");
 const { WrongParametersError } = require("../helpers/errors");
 
-const getListContacts = async (userId, favorite) => {
-  if (favorite) {
-    const favoriteContactsList = await Contact.find({
-      owner: userId,
-      favorite,
-    });
-    return favoriteContactsList;
-  }
-
-  const contactsList = await Contact.find({ owner: userId });
+const getListContacts = async (userId, reqQueryParams) => {
+  const contactsList = await Contact.find({ owner: userId, ...reqQueryParams });
   return contactsList;
 };
 
@@ -76,7 +68,6 @@ const updateStatus = async (contactId, favorite, userId) => {
     },
     { new: true }
   );
-  console.log(updatedStatus);
 
   if (!updatedStatus) {
     throw new WrongParametersError(

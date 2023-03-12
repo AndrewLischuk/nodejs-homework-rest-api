@@ -44,6 +44,8 @@ const putContactValidation = (req, res, next) => {
       .length(14)
       .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
       .optional(),
+
+    favorite: Joi.boolean().optional(),
   });
 
   const validationResult = putReq.validate(req.body);

@@ -9,9 +9,8 @@ const {
 } = require("../services/contactService");
 
 const getListContactsController = async (req, res) => {
-  const { favorite } = req.query;
   const { _id: userId } = req.user;
-  const contactsList = await getListContacts(userId, favorite);
+  const contactsList = await getListContacts(userId, req.query);
   res.json(contactsList);
 };
 
@@ -53,6 +52,7 @@ const updateContactController = async (req, res) => {
       `Missing fields! You need to provide at least one field to proceed`
     );
   }
+  console.log(req.body);
   const { name, email, phone, favorite } = req.body;
 
   const updatedContact = await updateContact(
