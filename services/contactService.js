@@ -40,15 +40,11 @@ const removeContact = async (contactId, userId) => {
   }
 };
 
-const updateContact = async (
-  contactId,
-  { name, email, phone, favorite },
-  userId
-) => {
+const updateContact = async (contactId, data, userId) => {
   const updatedContact = await Contact.findOneAndUpdate(
     { _id: contactId, owner: userId },
     {
-      $set: { name, email, phone, favorite },
+      $set: data,
     },
     { new: true }
   );

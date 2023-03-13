@@ -18,6 +18,8 @@ const postContactValidation = (req, res, next) => {
       .length(14)
       .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
       .required(),
+
+    favorite: Joi.boolean().optional(),
   });
 
   const validationResult = postReq.validate(req.body);
