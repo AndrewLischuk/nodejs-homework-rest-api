@@ -42,7 +42,6 @@ const updateSubscrController = async (req, res) => {
     throw new WrongParametersError(
       `You need to provide subscription value ("starter", "pro" or "business")`
     );
-    // return res.status(200).json({ status: "no changes" });
   }
   if (subscription) {
     const user = await updateSubscr(userId, subscription);

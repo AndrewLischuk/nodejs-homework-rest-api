@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 const { User } = require("../db/userModel");
 const { NotAuthorizedError, ConflictError } = require("../helpers/errors");
 
@@ -7,7 +8,8 @@ const registration = async (email, password) => {
   const userExists = await User.findOne({ email });
 
   if (!userExists) {
-    const user = new User({ email, password });
+    const avatarURL = gravatar.url(email, { s: "200" });
+    const user = new User({ email, password, avatarURL });
     await user.save();
     return user;
   }
