@@ -33,10 +33,18 @@ class ConflictError extends CustomProjectError {
   }
 }
 
+class VerificationError extends CustomProjectError {
+  constructor(message) {
+    super(message);
+    this.status = 404;
+  }
+}
+
 module.exports = {
   CustomProjectError,
   ValidationError,
   WrongParametersError,
   NotAuthorizedError,
   ConflictError,
+  VerificationError,
 };

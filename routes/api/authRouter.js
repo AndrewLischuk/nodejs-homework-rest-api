@@ -10,6 +10,10 @@ const {
 } = require("../../controllers/authController");
 const { authMiddleware } = require("../../middlewares/authMiddleware");
 const { patchSubscrValidation } = require("../../middlewares/validation");
+const {
+  verificationController,
+  repeatVerificationController,
+} = require("../../controllers/verificationController");
 
 const router = express.Router();
 
@@ -27,6 +31,9 @@ router
     patchSubscrValidation,
     authMiddleware,
     asyncWrapper(updateSubscrController)
-  );
+  )
+  .get("/verify/:verificationToken", asyncWrapper(verificationController))
+
+  .post("/verify", asyncWrapper(repeatVerificationController));
 
 module.exports = { authRouter: router };
