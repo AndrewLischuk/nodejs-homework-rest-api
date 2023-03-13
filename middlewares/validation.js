@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { ValidationError } = require("../helpers/errors");
 
 const postContactValidation = (req, res, next) => {
   const postReq = Joi.object({
@@ -17,11 +18,13 @@ const postContactValidation = (req, res, next) => {
       .length(14)
       .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
       .required(),
+
+    favorite: Joi.boolean().optional(),
   });
 
   const validationResult = postReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
@@ -43,11 +46,13 @@ const putContactValidation = (req, res, next) => {
       .length(14)
       .pattern(/^(.)+[0-9]+(.)+\s+[0-9]+(.)+[0-9]$/)
       .optional(),
+
+    favorite: Joi.boolean().optional(),
   });
 
   const validationResult = putReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
@@ -59,7 +64,19 @@ const patchFavValidation = (req, res, next) => {
 
   const validationResult = patchReq.validate(req.body);
   if (validationResult.error) {
-    return res.status(400).json({ message: `${validationResult.error}` });
+    next(new ValidationError(validationResult.error));
+  }
+  next();
+};
+
+const patchSubscrValidation = (req, res, next) => {
+  const patchReq = Joi.object({
+    subscription: Joi.string().optional().valid("starter", "pro", "business"),
+  });
+
+  const validationResult = patchReq.validate(req.query);
+  if (validationResult.error) {
+    next(new ValidationError(validationResult.error));
   }
   next();
 };
@@ -68,4 +85,5 @@ module.exports = {
   postContactValidation,
   putContactValidation,
   patchFavValidation,
+  patchSubscrValidation,
 };
