@@ -64,6 +64,7 @@ const updateStatus = async (contactId, favorite, userId) => {
     },
     { new: true }
   );
+  console.log(updatedStatus);
 
   if (!updatedStatus) {
     throw new WrongParametersError(
