@@ -3,9 +3,10 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const { User } = require("../db/userModel");
 const { NotAuthorizedError, ConflictError } = require("../helpers/errors");
-const { transporter } = require("../helpers/mailSender");
-const path = require("path");
+const { sendEmail } = require("../helpers/mailSender");
 const { v4: uuidv4 } = require("uuid");
+
+const { PORT, BASE_URL } = process.env;
 
 const registration = async (email, password) => {
   const userExists = await User.findOne({ email });
@@ -13,26 +14,17 @@ const registration = async (email, password) => {
   if (!userExists) {
     const avatarURL = gravatar.url(email, { s: "200" });
     const verificationToken = uuidv4();
+
     const user = new User({ email, password, avatarURL, verificationToken });
     await user.save();
 
-    const verifyURL = path.join(
-      `localhost:${process.env.PORT}`,
-      "/api/auth/users",
-      `/verify/${verificationToken}`
-    );
-    const emailOptions = {
-      from: "andrewlischuk@meta.ua",
+    const verificationOptions = {
       to: email,
       subject: "Verification",
       text: "Hello! Please verify your email by clicking the link below!",
-      html: `<a target="_blank" href="http://${verifyURL}">Confirm your email</a>`,
+      html: `<a target="_blank" href="${BASE_URL}${PORT}/api/auth/users/verify/${verificationToken}">Confirm your email</a>`,
     };
-
-    transporter
-      .sendMail(emailOptions)
-      .then(() => {})
-      .catch((err) => console.log(err));
+    await sendEmail(verificationOptions);
 
     return user;
   }

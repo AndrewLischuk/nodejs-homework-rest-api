@@ -1,7 +1,5 @@
 const nodemailer = require("nodemailer");
 
-require("dotenv").config();
-
 const config = {
   host: "smtp.meta.ua",
   port: 465,
@@ -14,4 +12,10 @@ const config = {
 
 const transporter = nodemailer.createTransport(config);
 
-module.exports = { transporter };
+const sendEmail = async (data) => {
+  const emailOptions = { ...data, from: "andrewlischuk@meta.ua" };
+  await transporter.sendMail(emailOptions);
+  return true;
+};
+
+module.exports = { sendEmail };
