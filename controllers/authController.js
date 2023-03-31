@@ -29,6 +29,7 @@ const logoutController = async (req, res) => {
 
 const currentUserController = async (req, res) => {
   const { _id: userId } = req.user;
+  // console.log(userId);
   const user = await currentUser(userId);
   return res
     .status(200)
